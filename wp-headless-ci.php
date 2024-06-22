@@ -2,11 +2,11 @@
 
 /**
  * Plugin Name: WP Headless CI
- * Plugin URI: http://example.com/
+ * Plugin URI: https://github.com/connect0459/wp-headless-ci
  * Description: Automates CI/CD workflow execution for headless WordPress with GitHub or GitLab.
- * Version: 1.0
+ * Version: 1.0.0
  * Author: Your Name
- * Author URI: http://example.com/
+ * Author URI: https://github.com/connect0459
  */
 
 // Exit if accessed directly
