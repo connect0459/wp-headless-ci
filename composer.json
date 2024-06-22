@@ -1,0 +1,12 @@
+{
+  "name": "connect0459/wp-headless-ci",
+  "description": "Automates CI/CD workflow execution for headless WordPress with GitHub or GitLab.",
+  "type": "wordpress-plugin",
+  "require": {
+    "php": ">=8.2",
+    "erusev/parsedown": "^1.7"
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}

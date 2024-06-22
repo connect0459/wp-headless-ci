@@ -1,0 +1,83 @@
+@charset "UTF-8";
+
+/* 
+destyle.cssで打ち消されたスタイルを必要な分だけ再定義するシート
+フォントなどgithub-markdownから変更したいスタイルもここに追加
+*/
+.markdown-body {
+  /* font-family: "Noto Sans JP", sans-serif; */
+  /* 
+  以下は配色の変数を上書きしている。デフォルトのgithub-markdownは
+  prefers-color-schemeをOSやユーザーエージェントから取得してテーマの切り替えを行うが、
+  markdown部分のみダークモードになると困るのでライトモードの定義を後から上書きする。
+  [data-theme="light"] に続く {} 内のコードをそのまま持ってきている。
+  作成日 : 2024-02-07
+  対応バージョン : 5.5.1
+  ダウンロード元 : https://cdnjs.com/libraries/github-markdown-css
+  */
+  color-scheme: light;
+  --color-prettylights-syntax-comment: #57606a;
+  --color-prettylights-syntax-constant: #0550ae;
+  --color-prettylights-syntax-entity: #6639ba;
+  --color-prettylights-syntax-storage-modifier-import: #24292f;
+  --color-prettylights-syntax-entity-tag: #116329;
+  --color-prettylights-syntax-keyword: #cf222e;
+  --color-prettylights-syntax-string: #0a3069;
+  --color-prettylights-syntax-variable: #953800;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #82071e;
+  --color-prettylights-syntax-invalid-illegal-text: #f6f8fa;
+  --color-prettylights-syntax-invalid-illegal-bg: #82071e;
+  --color-prettylights-syntax-carriage-return-text: #f6f8fa;
+  --color-prettylights-syntax-carriage-return-bg: #cf222e;
+  --color-prettylights-syntax-string-regexp: #116329;
+  --color-prettylights-syntax-markup-list: #3b2300;
+  --color-prettylights-syntax-markup-heading: #0550ae;
+  --color-prettylights-syntax-markup-italic: #24292f;
+  --color-prettylights-syntax-markup-bold: #24292f;
+  --color-prettylights-syntax-markup-deleted-text: #82071e;
+  --color-prettylights-syntax-markup-deleted-bg: #ffebe9;
+  --color-prettylights-syntax-markup-inserted-text: #116329;
+  --color-prettylights-syntax-markup-inserted-bg: #dafbe1;
+  --color-prettylights-syntax-markup-changed-text: #953800;
+  --color-prettylights-syntax-markup-changed-bg: #ffd8b5;
+  --color-prettylights-syntax-markup-ignored-text: #eaeef2;
+  --color-prettylights-syntax-markup-ignored-bg: #0550ae;
+  --color-prettylights-syntax-meta-diff-range: #8250df;
+  --color-prettylights-syntax-brackethighlighter-angle: #57606a;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #8c959f;
+  --color-prettylights-syntax-constant-other-reference-link: #0a3069;
+  --color-fg-default: #1f2328;
+  --color-fg-muted: #656d76;
+  --color-fg-subtle: #6e7781;
+  --color-canvas-default: #ffffff;
+  --color-canvas-subtle: #f6f8fa;
+  --color-border-default: #d0d7de;
+  --color-border-muted: hsla(210, 18%, 87%, 1);
+  --color-neutral-muted: rgba(175, 184, 193, 0.2);
+  --color-accent-fg: #0969da;
+  --color-accent-emphasis: #0969da;
+  --color-success-fg: #1a7f37;
+  --color-success-emphasis: #1f883d;
+  --color-attention-fg: #9a6700;
+  --color-attention-emphasis: #9a6700;
+  --color-attention-subtle: #fff8c5;
+  --color-danger-fg: #d1242f;
+  --color-danger-emphasis: #cf222e;
+  --color-done-fg: #8250df;
+  --color-done-emphasis: #8250df;
+}
+
+.markdown-body ul {
+  list-style-type: disc;
+  /* 最初のレベルでは黒丸 */
+}
+
+.markdown-body ul ul {
+  list-style-type: circle;
+  /* 2番目のレベルでは白丸 */
+}
+
+.markdown-body ul ul ul {
+  list-style-type: square;
+  /* 3番目以降のレベルでは黒四角 */
+}

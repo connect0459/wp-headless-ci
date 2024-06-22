@@ -1,0 +1,12 @@
+# 配布用の.gitignore（例：.distignore）
+# このファイルには配布パッケージに含めないファイルのみを記載
+.git
+.gitignore
+.distignore
+node_modules
+package.json
+package-lock.json
+composer.json
+composer.lock
+phpunit.xml
+tests

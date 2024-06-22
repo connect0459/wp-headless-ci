@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.4\n"
+
+# msgid "原文"
+# msgstr "翻訳"
+# Settings
+msgid "Settings"
+msgstr "設定"
+
+msgid "Enter your settings below:"
+msgstr "以下に設定を入力してください:"
+
+msgid "Auto Update"
+msgstr "自動更新"
+
+msgid "CI Provider"
+msgstr "CIプロバイダ"
+
+msgid "Access Token"
+msgstr "アクセストークン"
+
+msgid "Repository URL"
+msgstr "リポジトリURL"
+
+# Execute
+msgid "Execute"
+msgstr "実行"
+
+msgid "Execute CI/CD"
+msgstr "CI/CDを実行"
+
+msgid "Click the button below to manually trigger the CI/CD workflow:"
+msgstr "CI/CDワークフローを手動でトリガーするには、下のボタンをクリックしてください:"
+
+msgid "CI/CD workflow has been triggered successfully."
+msgstr "CI/CDワークフローが正常にトリガーされました。"
+
+msgid "CI/CDワークフローのトリガーに失敗しました。設定を確認して再試行してください。"
+msgstr "CI/CDワークフローのトリガーに失敗しました。"
+
+# README
+msgid "README.md not found."
+msgstr "README.mdが見つかりません。"

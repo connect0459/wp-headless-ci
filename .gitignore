@@ -1,0 +1,7 @@
+# 開発中は通常の.gitignoreを使用
+/vendor/
+/node_modules/
+*.log
+.DS_Store
+/**/.gitkeep
+
