@@ -158,18 +158,42 @@ class WP_Headless_CI
     public function sanitize($input)
     {
         $sanitary_values = array();
+
         if (isset($input['auto_update'])) {
             $sanitary_values['auto_update'] = $input['auto_update'];
         }
+
         if (isset($input['ci_provider'])) {
             $sanitary_values['ci_provider'] = sanitize_text_field($input['ci_provider']);
         }
+
         if (isset($input['token'])) {
             $sanitary_values['token'] = sanitize_text_field($input['token']);
         }
+
         if (isset($input['repo_url'])) {
-            $sanitary_values['repo_url'] = sanitize_text_field($input['repo_url']);
+            $sanitary_values['repo_url'] = esc_url_raw($input['repo_url']);
         }
+
+        // Validation
+        if (empty($sanitary_values['token'])) {
+            add_settings_error(
+                'wp_headless_ci_options',
+                'token_error',
+                wp_headless_ci_translate('Access Token is required.'),
+                'error'
+            );
+        }
+
+        if (empty($sanitary_values['repo_url'])) {
+            add_settings_error(
+                'wp_headless_ci_options',
+                'repo_url_error',
+                wp_headless_ci_translate('Repository URL is required.'),
+                'error'
+            );
+        }
+
         return $sanitary_values;
     }
 
@@ -363,10 +387,28 @@ class WP_Headless_CI
 
     public function create_settings_page()
     {
-        $this->render_template('settings.php', array(
+        $message = '';
+        $message_type = '';
+
+        // Check if settings are being saved
+        if (isset($_GET['settings-updated'])) {
+            $message = wp_headless_ci_translate('Settings saved successfully.');
+            $message_type = 'success';
+        }
+
+        // Check if there are any setting errors
+        $setting_errors = get_settings_errors('wp_headless_ci_options');
+        if (!empty($setting_errors)) {
+            $message = $setting_errors[0]['message'];
+            $message_type = $setting_errors[0]['type'];
+        }
+
+        $this->render_template('settings.php', [
+            'message' => $message,
+            'message_type' => $message_type,
             'options_group' => 'wp_headless_ci_option_group',
             'page' => 'wp-headless-ci-admin'
-        ));
+        ]);
     }
 
     public function create_execute_page()

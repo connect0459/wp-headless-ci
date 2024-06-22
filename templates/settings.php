@@ -3,6 +3,11 @@ $h1_str = wp_headless_ci_translate('Settings');
 ?>
 <div class="wrap">
     <h1><?= $h1_str ?></h1>
+    <?php if (!empty($message)) : ?>
+        <div class="notice notice-<?php echo esc_attr_e($message_type); ?>">
+            <p><?= wp_headless_ci_translate($message); ?></p>
+        </div>
+    <?php endif; ?>
     <form method="post" action="options.php">
         <?php
         if (isset($options_group)) {
