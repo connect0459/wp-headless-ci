@@ -247,21 +247,38 @@ class WP_Headless_CI
         return $this->send_request($api_url, $headers, $data);
     }
 
-    private function dispatch_gitlab_pipeline($token, $repo_url)
+    private function dispatch_gitlab_pipeline($token, $repo_url, $ref = 'main')
     {
         $project_id = $this->get_gitlab_project_id($repo_url);
-        $api_url = "https://gitlab.com/api/v4/projects/{$project_id}/pipeline";
+        $api_url = "https://gitlab.com/api/v4/projects/{$project_id}/trigger/pipeline";
 
-        $headers = [
-            'Authorization' => 'Bearer ' . $token,
-            'Content-Type' => 'application/json',
-        ];
+        $body = array(
+            'token' => $token,
+            'ref' => $ref
+        );
 
-        $data = [
-            'ref' => 'main',
-        ];
+        $args = array(
+            'body' => $body,
+            'method' => 'POST'
+        );
 
-        return $this->send_request($api_url, $headers, $data);
+        $response = wp_remote_post($api_url, $args);
+
+        if (is_wp_error($response)) {
+            error_log('WP Headless CI Error: ' . $response->get_error_message());
+            return false;
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+
+        if ($response_code >= 200 && $response_code < 300) {
+            error_log('WP Headless CI: GitLab pipeline triggered successfully. Response: ' . $response_body);
+            return true;
+        } else {
+            error_log('WP Headless CI Error: Unexpected response code ' . $response_code . '. Body: ' . $response_body);
+            return false;
+        }
     }
 
     private function send_request($url, $headers, $data)
@@ -281,13 +298,21 @@ class WP_Headless_CI
         }
 
         $response_code = wp_remote_retrieve_response_code($response);
-        return $response_code >= 200 && $response_code < 300;
+        $response_body = wp_remote_retrieve_body($response);
+
+        if ($response_code >= 200 && $response_code < 300) {
+            return true;
+        } else {
+            error_log('WP Headless CI Error: Unexpected response code ' . $response_code . '. Body: ' . $response_body);
+            return false;
+        }
     }
 
     private function get_gitlab_project_id($repo_url)
     {
         $path = parse_url($repo_url, PHP_URL_PATH);
-        return urlencode(trim($path, '/'));
+        $path = trim($path, '/');
+        return urlencode($path);
     }
 
     // HTML output for pages
