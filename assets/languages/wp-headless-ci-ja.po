@@ -32,6 +32,9 @@ msgstr "アクセストークン"
 msgid "Repository URL"
 msgstr "リポジトリURL"
 
+msgid "Settings saved successfully."
+msgstr "設定が正常に保存されました。"
+
 # Execute
 msgid "Execute"
 msgstr "実行"
