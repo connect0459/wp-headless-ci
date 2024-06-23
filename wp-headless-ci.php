@@ -53,14 +53,14 @@ class HeadlessPressCI
 
     public function __construct()
     {
-        add_action('admin_menu', array($this, 'add_plugin_pages'));
-        add_action('admin_init', array($this, 'page_init'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+        add_action('admin_menu', [$this, 'add_plugin_pages']);
+        add_action('admin_init', [$this, 'page_init']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
 
         $this->options = get_option('wp_headless_ci_options');
 
         if (isset($this->options['auto_update']) && $this->options['auto_update'] == 1) {
-            add_action('save_post', array($this, 'trigger_ci_on_save'), 10, 3);
+            add_action('save_post', [$this, 'trigger_ci_on_save'], 10, 3);
         }
     }
 
@@ -71,7 +71,7 @@ class HeadlessPressCI
             'WP Headless CI',
             'manage_options',
             'wp-headless-ci',
-            array($this, 'create_settings_page'),
+            [$this, 'create_settings_page'],
             'dashicons-admin-generic'
         );
         add_submenu_page(
@@ -80,7 +80,7 @@ class HeadlessPressCI
             whc_translate('Settings'),
             'manage_options',
             'wp-headless-ci',
-            array($this, 'create_settings_page')
+            [$this, 'create_settings_page']
         );
         add_submenu_page(
             'wp-headless-ci',
@@ -88,7 +88,7 @@ class HeadlessPressCI
             whc_translate('Execute'),
             'manage_options',
             'wp-headless-ci-execute',
-            array($this, 'create_execute_page')
+            [$this, 'create_execute_page']
         );
         add_submenu_page(
             'wp-headless-ci',
@@ -96,7 +96,7 @@ class HeadlessPressCI
             'README',
             'manage_options',
             'wp-headless-ci-readme',
-            array($this, 'create_readme_page')
+            [$this, 'create_readme_page']
         );
     }
 
@@ -112,7 +112,7 @@ class HeadlessPressCI
         register_setting(
             'wp_headless_ci_option_group',
             'wp_headless_ci_options',
-            array($this, 'sanitize')
+            [$this, 'sanitize']
         );
 
         add_settings_section(
@@ -125,7 +125,7 @@ class HeadlessPressCI
         add_settings_field(
             'auto_update',
             whc_translate('Auto Update'),
-            array($this, 'auto_update_callback'),
+            [$this, 'auto_update_callback'],
             'wp-headless-ci-admin',
             'wp_headless_ci_setting_section'
         );
@@ -133,7 +133,7 @@ class HeadlessPressCI
         add_settings_field(
             'ci_provider',
             whc_translate('CI Provider'),
-            array($this, 'ci_provider_callback'),
+            [$this, 'ci_provider_callback'],
             'wp-headless-ci-admin',
             'wp_headless_ci_setting_section'
         );
@@ -141,7 +141,7 @@ class HeadlessPressCI
         add_settings_field(
             'token',
             whc_translate('Access Token'),
-            array($this, 'token_callback'),
+            [$this, 'token_callback'],
             'wp-headless-ci-admin',
             'wp_headless_ci_setting_section'
         );
@@ -149,7 +149,7 @@ class HeadlessPressCI
         add_settings_field(
             'repo_url',
             whc_translate('Repository URL'),
-            array($this, 'repo_url_callback'),
+            [$this, 'repo_url_callback'],
             'wp-headless-ci-admin',
             'wp_headless_ci_setting_section'
         );
@@ -157,7 +157,7 @@ class HeadlessPressCI
 
     public function sanitize($input)
     {
-        $sanitary_values = array();
+        $sanitary_values = [];
 
         if (isset($input['auto_update'])) {
             $sanitary_values['auto_update'] = $input['auto_update'];
@@ -213,10 +213,10 @@ class HeadlessPressCI
 
     public function ci_provider_callback()
     {
-        $options = array(
+        $options = [
             'github' => 'GitHub',
             'gitlab' => 'GitLab'
-        );
+        ];
 
         $select = '<select name="wp_headless_ci_options[ci_provider]" id="ci_provider">';
 
@@ -310,15 +310,15 @@ class HeadlessPressCI
         $project_id = $this->get_gitlab_project_id($repo_url);
         $api_url = "https://gitlab.com/api/v4/projects/{$project_id}/trigger/pipeline";
 
-        $body = array(
+        $body = [
             'token' => $token,
             'ref' => $ref
-        );
+        ];
 
-        $args = array(
+        $args = [
             'body' => $body,
             'method' => 'POST'
-        );
+        ];
 
         $response = wp_remote_post($api_url, $args);
 
@@ -341,12 +341,12 @@ class HeadlessPressCI
 
     private function send_request($url, $headers, $data)
     {
-        $args = array(
+        $args = [
             'headers' => $headers,
             'body' => json_encode($data),
             'method' => 'POST',
             'data_format' => 'body',
-        );
+        ];
 
         $response = wp_remote_post($url, $args);
 
@@ -374,7 +374,7 @@ class HeadlessPressCI
     }
 
     // HTML output for pages
-    private function render_template($template_name, $variables = array())
+    private function render_template($template_name, $variables = [])
     {
         $template_path = plugin_dir_path(__FILE__) . 'templates/' . $template_name;
         if (file_exists($template_path)) {
