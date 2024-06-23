@@ -5,13 +5,13 @@ const ASSET_CSS_PATH_2 = 'assets/css/vendor/github-markdown-5.5.1.min.css';
 const ASSET_CSS_PATH_3 = 'assets/css/customMarkdown.css';
 
 /**
- * Plugin Name: WP Headless CI
- * Plugin URI: https://github.com/connect0459/wp-headless-ci
+ * Plugin Name: HeadlessWP CI
+ * Plugin URI: https://github.com/connect0459/headless-wp-ci
  * Description: Automates CI/CD workflow execution for headless WordPress with GitHub or GitLab.
  * Version: 0.0.1
  * Author: connect0459
  * Author URI: https://github.com/connect0459
- * Text Domain: wp-headless-ci
+ * Text Domain: headless-wp-ci
  * Domain Path: /assets/languages
  */
 
@@ -21,13 +21,13 @@ if (file_exists($autoload_path)) {
     require_once $autoload_path;
 } else {
     // ログに記録するか、管理者に通知する
-    error_log('WP Headless CI: Composer autoload file not found. Please run composer install.');
+    error_log('HeadlessWP CI: Composer autoload file not found. Please run composer install.');
 }
 
 // Parsedownクラスが利用可能かチェック
 if (!class_exists('Parsedown')) {
     // ログに記録するか、管理者に通知する
-    error_log('WP Headless CI: Parsedown class not found. Please check Composer installation.');
+    error_log('HeadlessWP CI: Parsedown class not found. Please check Composer installation.');
 }
 
 // Exit if accessed directly
@@ -41,13 +41,13 @@ if (!defined('ABSPATH')) {
  * @param string $text   The text to translate.
  * @return string The translated string
  */
-function wp_headless_ci_translate(string $text): string
+function hwpc_translate(string $text): string
 {
-    $translated = __($text, 'wp-headless-ci');
+    $translated = __($text, 'headless-wp-ci');
     return $translated;
 }
 
-class WP_Headless_CI
+class HeadlessPressCI
 {
     private $options;
 
@@ -57,7 +57,7 @@ class WP_Headless_CI
         add_action('admin_init', array($this, 'page_init'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
 
-        $this->options = get_option('wp_headless_ci_options');
+        $this->options = get_option('headless_wp_ci_options');
 
         if (isset($this->options['auto_update']) && $this->options['auto_update'] == 1) {
             add_action('save_post', array($this, 'trigger_ci_on_save'), 10, 3);
@@ -67,91 +67,91 @@ class WP_Headless_CI
     public function add_plugin_pages()
     {
         add_menu_page(
-            'WP Headless CI',
-            'WP Headless CI',
+            'HeadlessWP CI',
+            'HeadlessWP CI',
             'manage_options',
-            'wp-headless-ci',
+            'headless-wp-ci',
             array($this, 'create_settings_page'),
             'dashicons-admin-generic'
         );
         add_submenu_page(
-            'wp-headless-ci',
+            'headless-wp-ci',
             'Settings',
-            wp_headless_ci_translate('Settings'),
+            hwpc_translate('Settings'),
             'manage_options',
-            'wp-headless-ci',
+            'headless-wp-ci',
             array($this, 'create_settings_page')
         );
         add_submenu_page(
-            'wp-headless-ci',
+            'headless-wp-ci',
             'Execute',
-            wp_headless_ci_translate('Execute'),
+            hwpc_translate('Execute'),
             'manage_options',
-            'wp-headless-ci-execute',
+            'headless-wp-ci-execute',
             array($this, 'create_execute_page')
         );
         add_submenu_page(
-            'wp-headless-ci',
+            'headless-wp-ci',
             'README',
             'README',
             'manage_options',
-            'wp-headless-ci-readme',
+            'headless-wp-ci-readme',
             array($this, 'create_readme_page')
         );
     }
 
     public function enqueue_admin_scripts()
     {
-        wp_enqueue_style('wp-headless-ci-admin-css', plugins_url(ASSET_CSS_PATH_1, __FILE__));
-        wp_enqueue_style('wp-headless-ci-admin-css', plugins_url(ASSET_CSS_PATH_2, __FILE__));
-        wp_enqueue_style('wp-headless-ci-admin-css', plugins_url(ASSET_CSS_PATH_3, __FILE__));
+        wp_enqueue_style('headless-wp-ci-admin-css', plugins_url(ASSET_CSS_PATH_1, __FILE__));
+        wp_enqueue_style('headless-wp-ci-admin-css', plugins_url(ASSET_CSS_PATH_2, __FILE__));
+        wp_enqueue_style('headless-wp-ci-admin-css', plugins_url(ASSET_CSS_PATH_3, __FILE__));
     }
 
     public function page_init()
     {
         register_setting(
-            'wp_headless_ci_option_group',
-            'wp_headless_ci_options',
+            'headless_wp_ci_option_group',
+            'headless_wp_ci_options',
             array($this, 'sanitize')
         );
 
         add_settings_section(
-            'wp_headless_ci_setting_section',
-            wp_headless_ci_translate('Settings'),
+            'headless_wp_ci_setting_section',
+            hwpc_translate('Settings'),
             array($this, 'section_info'),
-            'wp-headless-ci-admin'
+            'headless-wp-ci-admin'
         );
 
         add_settings_field(
             'auto_update',
-            wp_headless_ci_translate('Auto Update'),
+            hwpc_translate('Auto Update'),
             array($this, 'auto_update_callback'),
-            'wp-headless-ci-admin',
-            'wp_headless_ci_setting_section'
+            'headless-wp-ci-admin',
+            'headless_wp_ci_setting_section'
         );
 
         add_settings_field(
             'ci_provider',
-            wp_headless_ci_translate('CI Provider'),
+            hwpc_translate('CI Provider'),
             array($this, 'ci_provider_callback'),
-            'wp-headless-ci-admin',
-            'wp_headless_ci_setting_section'
+            'headless-wp-ci-admin',
+            'headless_wp_ci_setting_section'
         );
 
         add_settings_field(
             'token',
-            wp_headless_ci_translate('Access Token'),
+            hwpc_translate('Access Token'),
             array($this, 'token_callback'),
-            'wp-headless-ci-admin',
-            'wp_headless_ci_setting_section'
+            'headless-wp-ci-admin',
+            'headless_wp_ci_setting_section'
         );
 
         add_settings_field(
             'repo_url',
-            wp_headless_ci_translate('Repository URL'),
+            hwpc_translate('Repository URL'),
             array($this, 'repo_url_callback'),
-            'wp-headless-ci-admin',
-            'wp_headless_ci_setting_section'
+            'headless-wp-ci-admin',
+            'headless_wp_ci_setting_section'
         );
     }
 
@@ -178,18 +178,18 @@ class WP_Headless_CI
         // Validation
         if (empty($sanitary_values['token'])) {
             add_settings_error(
-                'wp_headless_ci_options',
+                'headless_wp_ci_options',
                 'token_error',
-                wp_headless_ci_translate('Access Token is required.'),
+                hwpc_translate('Access Token is required.'),
                 'error'
             );
         }
 
         if (empty($sanitary_values['repo_url'])) {
             add_settings_error(
-                'wp_headless_ci_options',
+                'headless_wp_ci_options',
                 'repo_url_error',
-                wp_headless_ci_translate('Repository URL is required.'),
+                hwpc_translate('Repository URL is required.'),
                 'error'
             );
         }
@@ -199,14 +199,14 @@ class WP_Headless_CI
 
     public function section_info()
     {
-        $translated = wp_headless_ci_translate('Enter your settings below:');
+        $translated = hwpc_translate('Enter your settings below:');
         echo $translated;
     }
 
     public function auto_update_callback()
     {
         printf(
-            '<label class="switch"><input type="checkbox" id="auto_update" name="wp_headless_ci_options[auto_update]" value="1" %s><span class="slider round"></span></label>',
+            '<label class="switch"><input type="checkbox" id="auto_update" name="headless_wp_ci_options[auto_update]" value="1" %s><span class="slider round"></span></label>',
             (isset($this->options['auto_update']) && $this->options['auto_update'] === '1') ? 'checked' : ''
         );
     }
@@ -218,7 +218,7 @@ class WP_Headless_CI
             'gitlab' => 'GitLab'
         );
 
-        $select = '<select name="wp_headless_ci_options[ci_provider]" id="ci_provider">';
+        $select = '<select name="headless_wp_ci_options[ci_provider]" id="ci_provider">';
 
         foreach ($options as $value => $label) {
             $selected = isset($this->options['ci_provider']) && $this->options['ci_provider'] === $value ? ' selected' : '';
@@ -238,7 +238,7 @@ class WP_Headless_CI
     public function token_callback()
     {
         printf(
-            '<input type="text" class="regular-text" id="token" name="wp_headless_ci_options[token]" value="%s">',
+            '<input type="text" class="regular-text" id="token" name="headless_wp_ci_options[token]" value="%s">',
             isset($this->options['token']) ? esc_attr($this->options['token']) : ''
         );
     }
@@ -246,7 +246,7 @@ class WP_Headless_CI
     public function repo_url_callback()
     {
         printf(
-            '<input type="text" class="regular-text" id="repo_url" name="wp_headless_ci_options[repo_url]" value="%s">',
+            '<input type="text" class="regular-text" id="repo_url" name="headless_wp_ci_options[repo_url]" value="%s">',
             isset($this->options['repo_url']) ? esc_attr($this->options['repo_url']) : ''
         );
     }
@@ -295,11 +295,11 @@ class WP_Headless_CI
         $headers = [
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/vnd.github.v3+json',
-            'User-Agent' => 'wp-headless-ci'
+            'User-Agent' => 'headless-wp-ci'
         ];
 
         $data = [
-            'event_type' => 'wp_headless_ci_event',
+            'event_type' => 'headless_wp_ci_event',
         ];
 
         return $this->send_request($api_url, $headers, $data);
@@ -323,7 +323,7 @@ class WP_Headless_CI
         $response = wp_remote_post($api_url, $args);
 
         if (is_wp_error($response)) {
-            error_log('WP Headless CI Error: ' . $response->get_error_message());
+            error_log('HeadlessWP CI Error: ' . $response->get_error_message());
             return false;
         }
 
@@ -331,10 +331,10 @@ class WP_Headless_CI
         $response_body = wp_remote_retrieve_body($response);
 
         if ($response_code >= 200 && $response_code < 300) {
-            error_log('WP Headless CI: GitLab pipeline triggered successfully. Response: ' . $response_body);
+            error_log('HeadlessWP CI: GitLab pipeline triggered successfully. Response: ' . $response_body);
             return true;
         } else {
-            error_log('WP Headless CI Error: Unexpected response code ' . $response_code . '. Body: ' . $response_body);
+            error_log('HeadlessWP CI Error: Unexpected response code ' . $response_code . '. Body: ' . $response_body);
             return false;
         }
     }
@@ -351,7 +351,7 @@ class WP_Headless_CI
         $response = wp_remote_post($url, $args);
 
         if (is_wp_error($response)) {
-            error_log('WP Headless CI Error: ' . $response->get_error_message());
+            error_log('HeadlessWP CI Error: ' . $response->get_error_message());
             return false;
         }
 
@@ -361,7 +361,7 @@ class WP_Headless_CI
         if ($response_code >= 200 && $response_code < 300) {
             return true;
         } else {
-            error_log('WP Headless CI Error: Unexpected response code ' . $response_code . '. Body: ' . $response_body);
+            error_log('HeadlessWP CI Error: Unexpected response code ' . $response_code . '. Body: ' . $response_body);
             return false;
         }
     }
@@ -392,12 +392,12 @@ class WP_Headless_CI
 
         // Check if settings are being saved
         if (isset($_GET['settings-updated'])) {
-            $message = wp_headless_ci_translate('Settings saved successfully.');
+            $message = hwpc_translate('Settings saved successfully.');
             $message_type = 'success';
         }
 
         // Check if there are any setting errors
-        $setting_errors = get_settings_errors('wp_headless_ci_options');
+        $setting_errors = get_settings_errors('headless_wp_ci_options');
         if (!empty($setting_errors)) {
             $message = $setting_errors[0]['message'];
             $message_type = $setting_errors[0]['type'];
@@ -406,8 +406,8 @@ class WP_Headless_CI
         $this->render_template('settings.php', [
             'message' => $message,
             'message_type' => $message_type,
-            'options_group' => 'wp_headless_ci_option_group',
-            'page' => 'wp-headless-ci-admin'
+            'options_group' => 'headless_wp_ci_option_group',
+            'page' => 'headless-wp-ci-admin'
         ]);
     }
 
@@ -421,13 +421,13 @@ class WP_Headless_CI
         $message_type = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['manual_trigger']) && $_POST['manual_trigger'] === 'execute') {
-            check_admin_referer('wp_headless_ci_manual_trigger');
+            check_admin_referer('headless_wp_ci_manual_trigger');
             $result = $this->handle_manual_trigger();
             if ($result) {
-                $message = wp_headless_ci_translate('CI/CD workflow has been triggered successfully.');
+                $message = hwpc_translate('CI/CD workflow has been triggered successfully.');
                 $message_type = 'success';
             } else {
-                $message = wp_headless_ci_translate('Failed to trigger CI/CD workflow. Please check your settings and try again.');
+                $message = hwpc_translate('Failed to trigger CI/CD workflow. Please check your settings and try again.');
                 $message_type = 'error';
             }
         }
@@ -447,14 +447,14 @@ class WP_Headless_CI
         if (file_exists($readme_path)) {
             $readme_content = file_get_contents($readme_path);
             if ($readme_content === false) {
-                $error_message = wp_headless_ci_translate('Failed to read README.md file.');
+                $error_message = hwpc_translate('Failed to read README.md file.');
             } else {
                 // Parse Markdown to HTML
                 $parsedown = new Parsedown();
                 $readme_content = $parsedown->text($readme_content);
             }
         } else {
-            $error_message = wp_headless_ci_translate('README.md file not found.');
+            $error_message = hwpc_translate('README.md file not found.');
         }
 
         $this->render_template('readme.php', [
@@ -464,10 +464,10 @@ class WP_Headless_CI
     }
 }
 
-$wp_headless_ci = new WP_Headless_CI();
+$headless_wp_ci = new HeadlessPressCI();
 
-function wp_headless_ci_load_textdomain()
+function headless_wp_ci_load_textdomain()
 {
-    load_plugin_textdomain('wp-headless-ci', false, dirname(plugin_basename(__FILE__)) . '/assets/languages/');
+    load_plugin_textdomain('headless-wp-ci', false, dirname(plugin_basename(__FILE__)) . '/assets/languages/');
 }
-add_action('plugins_loaded', 'wp_headless_ci_load_textdomain');
+add_action('plugins_loaded', 'headless_wp_ci_load_textdomain');

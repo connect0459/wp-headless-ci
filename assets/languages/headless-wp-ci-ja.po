@@ -35,6 +35,12 @@ msgstr "リポジトリURL"
 msgid "Settings saved successfully."
 msgstr "設定が正常に保存されました。"
 
+msgid "Access Token is required."
+msgstr "アクセストークンは必須です。"
+
+msgid "Repository URL is required."
+msgstr "リポジトリURLは必須です。"
+
 # Execute
 msgid "Execute"
 msgstr "実行"
