@@ -5,7 +5,9 @@ destyle.cssで打ち消されたスタイルを必要な分だけ再定義する
 フォントなどgithub-markdownから変更したいスタイルもここに追加
 */
 .markdown-body {
+  padding: 2rem;
   /* font-family: "Noto Sans JP", sans-serif; */
+
   /* 
   以下は配色の変数を上書きしている。デフォルトのgithub-markdownは
   prefers-color-schemeをOSやユーザーエージェントから取得してテーマの切り替えを行うが、

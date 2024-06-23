@@ -1,10 +1,10 @@
-# HeadlessWP CI
+# WP Headless CI
 
 ## Installation
 
 ### Automatic Installation
 
-Search for `HeadlessWP CI` in the store and install the one whose author is `connect0459` and then activate it.
+Search for `WP Headless CI` in the store and install the one whose author is `connect0459` and then activate it.
 
 ### Manual Install
 
@@ -13,7 +13,7 @@ If downloaded as a zip file, place it under the plugins distribution as follows:
 ```txt
 wp-content
 └── plugins
-      └── headless-wp-ci
+      └── wp-headless-ci
             ├── assets
             ├── docs
             ├── templates
