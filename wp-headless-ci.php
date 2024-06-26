@@ -35,6 +35,13 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+function wp_headless_ci_load_textdomain()
+{
+    load_plugin_textdomain('wp-headless-ci', false, dirname(plugin_basename(__FILE__)) . '/assets/languages/');
+}
+add_action('plugins_loaded', 'wp_headless_ci_load_textdomain');
+
+
 /**
  * Translate and optionally escape and echo a string.
  *
@@ -62,6 +69,7 @@ class HeadlessPressCI
         if (isset($this->options['auto_update']) && $this->options['auto_update'] == 1) {
             add_action('save_post', [$this, 'trigger_ci_on_save'], 10, 3);
         }
+        add_action('init', array($this, 'register_post_type_hooks'));
     }
 
     public function add_plugin_pages()
@@ -123,14 +131,6 @@ class HeadlessPressCI
         );
 
         add_settings_field(
-            'auto_update',
-            whc_translate('Auto Update'),
-            [$this, 'auto_update_callback'],
-            'wp-headless-ci-admin',
-            'wp_headless_ci_setting_section'
-        );
-
-        add_settings_field(
             'ci_provider',
             whc_translate('CI Provider'),
             [$this, 'ci_provider_callback'],
@@ -150,6 +150,22 @@ class HeadlessPressCI
             'repo_url',
             whc_translate('Repository URL'),
             [$this, 'repo_url_callback'],
+            'wp-headless-ci-admin',
+            'wp_headless_ci_setting_section'
+        );
+
+        add_settings_field(
+            'auto_update',
+            whc_translate('Auto Update'),
+            array($this, 'auto_update_callback'),
+            'wp-headless-ci-admin',
+            'wp_headless_ci_setting_section'
+        );
+
+        add_settings_field(
+            'post_types',
+            whc_translate('Post Types to Monitor'),
+            array($this, 'post_types_callback'),
             'wp-headless-ci-admin',
             'wp_headless_ci_setting_section'
         );
@@ -194,6 +210,10 @@ class HeadlessPressCI
             );
         }
 
+        if (isset($input['post_types'])) {
+            $sanitary_values['post_types'] = array_map('sanitize_text_field', $input['post_types']);
+        }
+
         return $sanitary_values;
     }
 
@@ -201,14 +221,6 @@ class HeadlessPressCI
     {
         $translated = whc_translate('Enter your settings below:');
         echo $translated;
-    }
-
-    public function auto_update_callback()
-    {
-        printf(
-            '<label class="switch"><input type="checkbox" id="auto_update" name="wp_headless_ci_options[auto_update]" value="1" %s><span class="slider round"></span></label>',
-            (isset($this->options['auto_update']) && $this->options['auto_update'] === '1') ? 'checked' : ''
-        );
     }
 
     public function ci_provider_callback()
@@ -249,6 +261,96 @@ class HeadlessPressCI
             '<input type="text" class="regular-text" id="repo_url" name="wp_headless_ci_options[repo_url]" value="%s">',
             isset($this->options['repo_url']) ? esc_attr($this->options['repo_url']) : ''
         );
+    }
+
+    public function auto_update_callback()
+    {
+        printf(
+            '<label class="switch"><input type="checkbox" id="auto_update" name="wp_headless_ci_options[auto_update]" value="1" %s><span class="slider round"></span></label>',
+            (isset($this->options['auto_update']) && $this->options['auto_update'] === '1') ? 'checked' : ''
+        );
+    }
+
+    public function post_types_callback()
+    {
+        $post_types = get_post_types(array('public' => true), 'objects');
+        $saved_types = isset($this->options['post_types']) ? $this->options['post_types'] : array();
+        $auto_update = isset($this->options['auto_update']) && $this->options['auto_update'] === '1';
+
+        echo '<div id="post-types-section" style="' . ($auto_update ? '' : 'display: none;') . '">';
+        echo '<div class="post-types-list">';
+        echo '<label><input type="checkbox" id="select-all-post-types"> ' . whc_translate('Select All') . '</label><br><br>';
+
+        foreach ($post_types as $post_type) {
+            $checked = in_array($post_type->name, $saved_types) ? 'checked' : '';
+            echo '<label>';
+            echo '<input type="checkbox" name="wp_headless_ci_options[post_types][]" value="' . esc_attr($post_type->name) . '" ' . $checked . '> ';
+            echo esc_html($post_type->label);
+            echo '</label><br>';
+        }
+        echo '</div>';
+        echo '</div>';
+
+        echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var autoUpdateCheckbox = document.getElementById("auto_update");
+            var postTypesSection = document.getElementById("post-types-section");
+            var selectAllCheckbox = document.getElementById("select-all-post-types");
+            var allCheckboxes = document.querySelectorAll(".post-types-list input[type=\'checkbox\']:not(#select-all-post-types)");
+
+            function togglePostTypesSection() {
+                postTypesSection.style.display = autoUpdateCheckbox.checked ? "block" : "none";
+            }
+
+            autoUpdateCheckbox.addEventListener("change", togglePostTypesSection);
+
+            selectAllCheckbox.addEventListener("change", function() {
+                allCheckboxes.forEach(function(checkbox) {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            // Initialize the display state
+            togglePostTypesSection();
+        });
+        </script>';
+    }
+
+    public function register_post_type_hooks()
+    {
+        if (!isset($this->options['auto_update']) || $this->options['auto_update'] != 1) {
+            return;
+        }
+
+        if (!isset($this->options['post_types']) || empty($this->options['post_types'])) {
+            return;
+        }
+
+        add_action('wp_insert_post', array($this, 'trigger_ci_on_post_action'), 10, 3);
+        add_action('post_updated', array($this, 'trigger_ci_on_post_action'), 10, 3);
+        add_action('before_delete_post', array($this, 'trigger_ci_on_post_delete'), 10, 1);
+    }
+
+    public function trigger_ci_on_post_action($post_id, $post, $update)
+    {
+        $post_type = get_post_type($post_id);
+
+        if (!in_array($post_type, $this->options['post_types'])) {
+            return;
+        }
+
+        $this->dispatch_ci();
+    }
+
+    public function trigger_ci_on_post_delete($post_id)
+    {
+        $post_type = get_post_type($post_id);
+
+        if (!in_array($post_type, $this->options['post_types'])) {
+            return;
+        }
+
+        $this->dispatch_ci();
     }
 
     public function trigger_ci_on_save($post_id, $post, $update)
@@ -465,9 +567,3 @@ class HeadlessPressCI
 }
 
 $wp_headless_ci = new HeadlessPressCI();
-
-function wp_headless_ci_load_textdomain()
-{
-    load_plugin_textdomain('wp-headless-ci', false, dirname(plugin_basename(__FILE__)) . '/assets/languages/');
-}
-add_action('plugins_loaded', 'wp_headless_ci_load_textdomain');
